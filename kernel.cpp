@@ -2,6 +2,7 @@
 // Created by lichtgott on 20.06.25.
 //
 #include "types.h"
+#include "gdt.h"
 
 
 void printf(char* str){
@@ -24,6 +25,8 @@ extern "C" void callConstructors(){
 
 extern "C" void kernelMain(const void* multiboot_structure, uint32_t /* multiboot magicnumber*/){
   printf("FUER DIE LGM-RECHTSANWAELTE");
+
+  GlobalDescriptorTable gdt;
 
   while(1);
 }
