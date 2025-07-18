@@ -3,6 +3,7 @@
 //
 #include "types.h"
 #include "gdt.h"
+#include "interrupts.h"
 
 
 void printf(char* str){
@@ -48,6 +49,42 @@ extern "C" void callConstructors(){
   for(constructor* i = &start_ctors; i != &end_ctors; ++i){
     (*i)();
   }
+}
+
+
+void printNumber(uint32_t number)
+{
+  int8_t maxStringLength = 10;
+  char intToChar[] = {'0','1','2','3','4','5','6','7','8','9'};
+  char chars[maxStringLength];
+  char tmp[2];
+  tmp[1] = '\0';
+  int i = 0;
+
+  if(number == 0)
+  {
+    tmp[0] = '0';
+    printf(tmp);
+    printf(";");
+    return;
+  }
+
+  while(number != 0 && i <= maxStringLength)
+  {
+    chars[i++] = intToChar[number % 10];
+    number = number/10;
+  }
+
+
+
+  //reverses the chars
+  while (i > 0)
+  {
+    tmp[0] = chars[--i];
+    printf(tmp);
+  }
+  printf(";");
+
 }
 
 extern "C" void kernelMain(const void* multiboot_structure, uint32_t /* multiboot magicnumber*/){
