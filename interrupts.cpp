@@ -10,6 +10,7 @@ void printNumber(uint32_t number);
 
 
 InterruptManager::GateDescriptor InterruptManager::interruptDescriptorTable[256];
+InterruptManager* InterruptManager::ActiveInterruptManager = nullptr;
 
 
 void InterruptManager::SetInterruptDescriptorTableEntry(
@@ -73,12 +74,44 @@ InterruptManager::~InterruptManager() {
 
 void InterruptManager::Activate()
 {
+    if (ActiveInterruptManager != nullptr)
+        ActiveInterruptManager->Deactivate();
+    ActiveInterruptManager = this;
     asm("sti");
 }
 
-uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp) {
+void InterruptManager::Deactivate()
+{
+    if (ActiveInterruptManager == this)
+    {
+        ActiveInterruptManager = nullptr;
+        asm("cli");
+    }
+}
 
+uint32_t InterruptManager::handleInterrupt(uint8_t interruptNumber, uint32_t esp) {
+    if (ActiveInterruptManager != nullptr)
+    {
+        return ActiveInterruptManager->ObjectOrientedHandleInterrupt(interruptNumber, esp);
+    }
     printf(" INTERRUPT");
+
+    return esp;
+}
+
+uint32_t InterruptManager::ObjectOrientedHandleInterrupt(uint8_t interruptNumber, uint32_t esp)
+{
+    if (interruptNumber != 0x20)
+    {
+        printf("Interrupt");
+    }
+
+    if (0x20 <= interruptNumber && interruptNumber < 0x30)
+    {
+        picMasterCommand.Write(0x20);
+        if (0x28 <= interruptNumber && interruptNumber < 0x30)
+            picMasterData.Write(0x20);
+    }
 
     return esp;
 }
