@@ -38,8 +38,8 @@ run: lgmkernel.iso
 #reset:
 #	rm *.o *.bin *.iso
 
-resetAndRun:
-	make reset && sleep 1
+cleanAndRun:
+	make clean && sleep 1
 	make run
 
 
